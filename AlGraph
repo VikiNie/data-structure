@@ -1,0 +1,264 @@
+/*实验报告－10
+课程名__ 数据结构  实验名称_基于邻接表的图的基本操作 
+实   验   日   期       年   月   日      实 验 报 告 日 期       年   月   日
+姓    名_________学号_____________   
+一、实验目的
+通过上机实验实现图的存储表示--邻接表，实现图的遍历算法和最小生成树，最短路径等问题。
+
+二、实验内容
+（1）建立带权有向图（如下图）的邻接表。
+（2）输出该图从顶点1开始的深度优先遍历序列。
+（3）输出该图从顶点1开始的广度优先遍历序列。                      
+（4）看成无向图，输出从顶点1开始的最小生成树。（选做）
+（5）求顶点1到其它顶点的最短路径。（选做）
+ 
+三、实验环境
+四、实验步骤
+（描述实验步骤及中间的结果或现象。在实验中做了什么事情，怎么做的，发生的现象和中间结果）
+
+五、实验结果
+（相关文件制成压缩文件提交，注明文件名）
+
+六、总结
+（说明实验过程中遇到的问题及解决办法；个人的收获；未解决的问题等）
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include"ds.h"
+
+#define TRUE          1
+#define FALSE         0
+#define OK            1
+#define ERROR         0
+#define INFEASIBLE   -1
+#define OVERFLOW     -2
+typedef int Status;
+typedef int ElemType;
+typedef int VRType;
+typedef int InfoType;
+typedef int QElemType;
+
+#define MAX_VERTEX_NUM 20
+#define MAX 1000000
+int visited[7],n=8,m=13;
+typedef  struct ArcNode{	
+    int adjvex;
+    struct ArcNode *nextarc;
+} ArcNode;
+ArcNode adj[MAX];
+
+typedef  struct VNode{	//顶点数组元素的类型
+    ElemType data;
+    ArcNode *firstarc;	//单链表的头指针
+} VNode;
+
+typedef struct{
+    VNode vertices[MAX_VERTEX_NUM];  //顶点数组
+    int vexnum, arcnum;
+}ALGraph;
+
+typedef struct QNode{
+	QElemType      data;
+	struct QNode * next;
+}QNode,* QueuePtr;
+
+typedef struct{
+	QueuePtr front;
+	QueuePtr rear;
+}LinkQueue;
+
+int Create(ArcNode adj[],int n,int m)//邻接表建表函数，n代表定点数，m代表边数
+{
+	int i;
+	ArcNode *p;
+	for (i=1;i<=n;i++)
+	{
+		adj[i].adjvex=i;
+		adj[i].nextarc=NULL;
+	}
+	for(i=1;i<=m;i++)
+	{
+		printf("请输入第%d条边",i);
+		int u,v;
+		scanf("%d%d",&u,&v);
+		p=new ArcNode;
+		p->adjvex=v;
+		p->nextarc=adj[u].nextarc;
+		adj[u].nextarc=p;
+	}
+	return 1;
+}
+
+int Addnode(int u,int v)//此函数用于增加边
+{
+	ArcNode *p;
+	p=new ArcNode;
+	p->adjvex=v;
+	p->nextarc=adj[u].nextarc;
+	adj[u].nextarc=p;
+	return 1;
+}
+
+void print(int n)//邻接表打印函数
+{
+	int i;
+	ArcNode *p;
+	for(i=1;i<=n;i++)
+	{
+		p=&adj[i];
+		while(p!=NULL)
+		{
+			printf("%d ",p->adjvex);
+			p=p->nextarc;
+		}
+		printf("\n");
+	}
+}
+
+int FirstAdjVex(ArcNode adj[],int i){
+   //求顶点i的第一个邻接点（i为顶点在图中的位置）
+	ArcNode *p;
+	if(i<0 ||i>=n)return -1;
+	p=adj[i].nextarc;
+	if(p!=NULL)return p->adjvex;
+	return -1;
+}// FirstAdjVex
+
+int NextAdjVex(ArcNode adj[], int i,int j){
+	ArcNode *p;
+	if(i<0 ||i>=n)return -1;
+	if(j<0 ||j>=n)return -1;
+	p=adj[i].nextarc;
+	while(p && p->adjvex!=j)p=p->nextarc;
+	if(p==NULL ||p->nextarc==NULL)return -1;
+	return p->nextarc->adjvex;
+}// NextAdjVex
+
+
+void DFS(ArcNode adj[],int v){ //v表示的是下标
+	int w;
+	printf("%d",adj[v].adjvex); 
+    visited[v]=1; 
+	w=FirstAdjVex(adj,v);
+    while(w!=-1){ //w是v的邻接点
+      if(visited[w]==0)DFS(adj,w);
+      w=NextAdjVex(adj,v,w); //求v的下一个邻接点
+   }
+}
+
+void DFSTraverse(ArcNode adj[]){
+	int v;
+    for(v=0;v<n;v++)visited[v]=0;
+    for(v=0;v<n;v++)
+      if(visited[v]==0)DFS(adj,v);
+}// DFSTraverse 
+//DFS 
+
+Status InitQueue(LinkQueue *pQ){
+	(*pQ).front=(*pQ).rear=(QueuePtr)malloc(sizeof(QNode));
+	if(!(*pQ).front)exit(OVERFLOW);
+	(*pQ).front->next=NULL;
+	return OK;
+}
+
+Status EnQueue(LinkQueue *pQ,QElemType e){
+    QueuePtr p;
+	p=(QueuePtr)malloc(sizeof(QNode));
+	if(!p)exit(OVERFLOW);
+	p->data=e;
+	p->next=NULL;
+	(*pQ).rear->next=p;
+	(*pQ).rear=p;
+	return OK;
+}
+
+Status QueueEmpty(LinkQueue Q){
+	if(Q.front==Q.rear) return TRUE;
+	else return FALSE;
+}
+
+
+Status DeQueue(LinkQueue *pQ,QElemType *pe){
+    QueuePtr p;
+	if((*pQ).front==(*pQ).rear)return ERROR;
+	p=(*pQ).front->next;
+	*pe=p->data;
+	(*pQ).front->next=p->next;
+	if((*pQ).rear==p)(*pQ).rear=(*pQ).front;
+	free(p);
+	return OK;
+}
+
+void BFSTraverse(ArcNode adj[]){
+	int v,u,w;
+	for(v=0;v<n;v++)visited[v]=0;
+	LinkQueue Q;
+    InitQueue(&Q);
+    for(v=0;v<n;v++){
+        if(visited[v]==1)continue;
+		printf("%d",adj[v].adjvex); 
+		visited[v]=1;
+        EnQueue(&Q,v);
+        while(!QueueEmpty(Q)){
+            DeQueue(&Q,&u);
+            w=FirstAdjVex(adj,u);
+			for(;w!=-1; w=NextAdjVex(adj,u,w)){
+                if(visited[w]==1)continue;
+				printf("%d",adj[w].adjvex); 
+				visited[w]=1;
+                EnQueue(&Q,w);
+            }//for
+        }//while
+    }//for
+}//BFSTraverse
+
+
+int main()
+{
+	char ch;
+	printf("顶点数目：%d\n",n);
+	printf("邻边的数目：%d\n",m);
+	Create(adj,n,m);
+	printf("输入的邻接表为:\n");
+	print(n);
+		while(1){
+		printf("\n=======BiTtree=======");
+		printf("\n 1--深度优先遍历序列");
+		printf("\n 2--广度优先遍历序列");
+		printf("\n 3--最小生成树");
+		printf("\n 4--求顶点1到其它顶点的最短路径");
+		printf("\n 5--结束运行");
+		printf("\n\nPlease Choose:");
+		ch=getchar();
+		switch(ch){
+			case '1':
+			fflush(stdin);
+			printf("\n**深度优先遍历序列**");
+			DFSTraverse(adj);
+			break;
+			case '2':
+			fflush(stdin);
+			printf("\n**广度优先遍历序列**");
+			BFSTraverse(adj);
+			break;
+		/*case '3':
+			fflush(stdin);
+			printf("\n**最小生成树**");
+			InOrderTraverse(T);
+			break;
+		case '4':
+			fflush(stdin);
+			printf("\n**求顶点1到其它顶点的最短路径**");
+			AftOrderTraverse(T);
+			break;
+		case '5':
+			fflush(stdin);
+			DestroyBiTree(T);
+			exit(0);*/
+		default:
+			printf("\nInvalid Choice");
+		}
+	}
+	return 0;
+}
