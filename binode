@@ -1,0 +1,138 @@
+/*实验报告－8
+课程名__ 数据结构  实验名称_二叉树操作实现
+实   验   日   期       年   月   日      实 验 报 告 日 期       年   月   日
+姓    名_________学号_____________   
+一、实验目的
+掌握循环队列的简单操作
+
+二、实验内容
+编写一个程序,实现基于二叉链表的二叉树的操作
+1.用先序的方法建立二叉树
+2.实现二叉树的遍历(先、中、后序)
+3.求二叉树中节点的个数
+三、实验环境
+
+四、实验步骤
+（描述实验步骤及中间的结果或现象。在实验中做了什么事情，怎么做的，发生的现象和中间结果）
+
+五、实验结果
+（相关文件制成压缩文件提交，注明文件名）
+
+六、总结
+（说明实验过程中遇到的问题及解决办法；个人的收获；未解决的问题等）
+*/
+#include<stdio.h>
+#include<stdlib.h>
+#include"ds.h"
+
+#define TRUE          1
+#define FALSE         0
+#define OK            1
+#define ERROR         0
+#define INFEASIBLE   -1
+#define OVERFLOW     -2
+typedef int Status;
+typedef int TElemType;
+
+
+typedef struct BiTNode{
+	TElemType data;
+	struct BiTNode    *lchild,*rchild;
+}BiTNode,  *BiTree;
+
+Status CreateBiTree(BiTree *pT){
+	char ch;
+	scanf("%c",&ch);
+	if(ch=='#')*pT=NULL;
+	else{
+		(*pT)=(BiTNode *)malloc(sizeof(BiTNode));
+		if(!(*pT))exit(OVERFLOW);
+		(*pT)->data=ch;
+		CreateBiTree(&(*pT)->lchild);
+		CreateBiTree(&(*pT)->rchild);
+	}
+	return OK;
+}
+
+void PreOrderTraverse(BiTree T){
+	if(T==NULL)return;
+	printf("%c ",T->data);
+	PreOrderTraverse(T->lchild);
+	PreOrderTraverse(T->rchild);
+}
+
+void InOrderTraverse(BiTree T){
+	if(T==NULL)return;
+	InOrderTraverse(T->lchild);
+	printf("%c ",T->data);
+	InOrderTraverse(T->rchild);
+}
+
+void AftOrderTraverse(BiTree T){
+	if(T==NULL)return;
+	AftOrderTraverse(T->lchild);	
+	AftOrderTraverse(T->rchild);
+	printf("%c ",T->data);
+}
+int  GetCount(BiTree T){
+       if(T==NULL)return 0;
+       return GetCount(T->lchild) + GetCount(T->rchild)+1;
+}//GetCount
+
+void DestroyBiTree(BiTree T){
+	free(T);
+}
+void main()
+{
+	int rc,i;
+	char ch;
+	BiTree T;
+	while(1){
+		printf("\n=======BiTtree=======");
+		printf("\n 1--创建二叉树");
+		printf("\n 2--采用先序遍历法输出");
+		printf("\n 3--采用中序遍历法输出");
+		printf("\n 4--采用后序遍历法输出");
+		printf("\n 5--     计算节点数   ");
+		printf("\n 6--Exit.             ");
+		printf("\n\nPlease Choose:");
+		ch=getchar();
+		switch(ch){
+			case '1':
+			fflush(stdin);
+			printf("\n**创建二叉树**");
+			rc=CreateBiTree(&T);
+			if(rc!=OK)printf("\ni invalid");
+			
+			break;
+			case '2':
+			fflush(stdin);
+			printf("\n**采用先序遍历法输出**");
+			PreOrderTraverse(T);
+			break;
+		case '3':
+			fflush(stdin);
+			printf("\n**采用中序遍历法输出**");
+			InOrderTraverse(T);
+			break;
+		case '4':
+			fflush(stdin);
+			printf("\n**采用后序遍历法输出**");
+			AftOrderTraverse(T);
+			break;
+		case '5':
+			fflush(stdin);
+			printf("\n**计算节点数**");
+			i=GetCount(T);
+			printf("节点数为%d ",i);
+			break;
+		case '6':
+			fflush(stdin);
+			DestroyBiTree(T);
+			exit(0);
+		default:
+			printf("\nInvalid Choice");
+		}
+	}
+}
+
