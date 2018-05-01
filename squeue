@@ -1,0 +1,124 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include "ds.h"
+
+#define TRUE     1
+#define FALSE    0
+#define OK       1
+#define ERROR    0
+#define INFEASIBLE -1
+#define OVERFLOW -2
+typedef int Status;
+
+#define LIST_INIT_SIZE 100
+#define LISTINCREMENT  10
+
+typedef int ElemType;
+typedef struct{
+	ElemType *elem;
+	int length;
+	int listsize;
+}Sqlist;
+
+void InitList_Sq(Sqlist *pL);
+Status ListInsert_Sq(Sqlist *pL,int i,ElemType e);
+Status ListDelete_Sq(Sqlist *pL,int i,ElemType* pe);
+Status GetElem_Sq(Sqlist L,int i,ElemType* pe);
+void PrintAll(Sqlist L);
+void DestroyList_Sq(Sqlist L);
+
+void main(void){
+	int rc,i;
+	char ch;
+	ElemType e;
+
+	Sqlist L;
+	InitList_Sq(&L);
+	while(1){
+		i=e=0;
+		printf("\n======SqList======");
+		printf("\n  1--Insert an Element.");
+		printf("\n  2--Delete an Element.");
+		printf("\n  3--Get    an Element.");
+		printf("\n  4--Print All.        ");
+		printf("\n  5--Exit.             ");
+		printf("\n\nPlease Choose:");
+		ch=getchar();
+		switch(ch){
+		case '1':
+			printf("\n**Insert**");
+			printf("\nInput i:");
+			scanf("%d",&i);
+			fflush(stdin);
+			printf("Input e:");
+			scanf("%d",&e);
+			fflush(stdin);
+			rc=ListInsert_Sq(&L,i,e);
+			if(rc!=OK)printf("\n invalid");
+			else printf("\ni=%d,e=%d Inserted",i,e);
+			break;
+		case '2':
+			printf("\n**Delete**");
+			printf("\nInput i:");
+			scanf("%d",&i);
+			fflush(stdin);
+			rc=ListDelete_Sq(&L,i,&e);
+			if(rc!=OK)printf("\n invalid");
+			else printf("\ni=%d,e=%d Deleted",i,e);
+			break;
+		case '3':
+			printf("\n**Get**");
+			printf("\nInput i:");
+			scanf("%d",&i);
+			fflush(stdin);
+			rc=GetElem_Sq(L,i,&e);
+			if(rc!=OK)printf("\ni invalid");
+			else printf("\ni=%d,e=%d",i,e);
+			break;
+		case '4':
+			printf("\n**Print All**");
+		    PrintAll(L);
+			break;
+		case '5':
+			DestroyList_Sq(L);
+			exit(0);
+		default:
+			printf("\nInvalid Choise");
+		}
+	}
+}
+
+void InitList_Sq(Sqlist* pL){
+	(*pL).elem=(ElemType*)malloc(LIST_INIT_SIZE*sizeof(ElemType));
+	if(!(*pL).elem)exit(OVERFLOW);
+	(*pL).length=0;
+	(*pL).listsize=LIST_INIT_SIZE;
+}
+Status ListInsert_Sq(Sqlist* pL,int i,ElemType e){
+	 int j; 
+     if(i<1 || i>(* pL).length+1)return ERROR;
+     for(j=(* pL).length;j>=i;j--)(* pL).elem[j]=(* pL).elem[j-1]; 
+     (* pL).elem[i-1]=e;
+     (* pL).length++;
+     return OK;
+}
+Status ListDelete_Sq(Sqlist* pL,int i,ElemType *p){
+	int j;
+	if(i<1 || i>(* pL).length)return ERROR;
+	*p=(* pL).elem[i-1];	
+	for(j=i;j<(* pL).length;j++)(* pL).elem[j-1]=(* pL).elem[j];  
+	(* pL).length--;
+	return OK;
+}
+Status GetElem_Sq(Sqlist L,int i,ElemType *pe){
+	if(i<1 || i>L.length)return ERROR;
+	*pe=L.elem[i-1];	
+	return OK;
+}
+void PrintAll(Sqlist L){
+	int i;
+	for(i=0;i<L.length;i++)printf("%d ",L.elem[i]);
+}
+void DestroyList_Sq(Sqlist L){
+	free(L.elem);
+}
