@@ -1,0 +1,166 @@
+/*实验报告－11
+课程名__ 数据结构  实验名称_成绩统计问题——排序算法应用 
+实   验   日   期       年   月   日      实 验 报 告 日 期       年   月   日
+姓    名_________学号_____________   
+一、实验目的
+（1）掌握常用的排序方法
+（2）了解各种排序方法的过程及其依据的原则
+（3）并掌握各种排序方法的效率的分析方法。
+二、实验内容
+给出n（n>=10）个学生的考试成绩表，每条信息由姓名和计算机考试成绩组成，试运用各种排序思想设计算法并比较其性能，要求实现：
+a．按分数高低次序，打印出每个学生在考试中获得的名次，分数相同的为同一名次；
+b．按名次列出每个学生的姓名与分数。
+C．用户可以选择自己想调用的排序算法
+排序算法要求实现：
+(1)实现直接插入排序。
+(2)实现简单选择排序。
+(3)实现冒泡排序。
+(4)实现快速排序算法。（选做）
+(5)实现堆排序算法。（选做）
+(6)实现二路归并排序。（选做）
+
+三、实验环境
+四、实验步骤
+（描述实验步骤及中间的结果或现象。在实验中做了什么事情，怎么做的，发生的现象和中间结果）
+
+五、实验结果
+（相关文件制成压缩文件提交，注明文件名）
+
+六、总结
+（说明实验过程中遇到的问题及解决办法；个人的收获；未解决的问题等）
+*/
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+
+
+/* ****************************预定义******************************** */
+#define MAXSIZE 20  //一个用作示例的小顺序表的最大长度
+
+typedef int KeyType;//定义关键字类型为整数类型
+
+typedef struct{
+	KeyType key;    //关键字项,记录学生成绩
+	char name[50];  //其他数据项，记录学生姓名
+}RedType;                //记录类型
+
+typedef struct{
+	 RedType r[MAXSIZE];   //r[0]闲置或用作哨兵单元
+	 int length;           //顺序表长度
+}SqList;                   //顺序表类型
+
+/* **************************自定义函数******************************** */
+void InsertSort(SqList *L){
+	//直接插入排序算法
+	int i,j;
+    for(i=1; i<(*L).length; i++){     // i 代表趟号
+		(*L).r[0]=(*L).r[i+1];		   // 设置哨兵
+        for(j=i; (*L).r[j].key>(*L).r[0].key; j--)(*L).r[j+1]=(*L).r[j];
+        (*L).r[j+1]=(*L).r[0];
+    }
+}
+
+void SelectSort(SqList *L){
+	//简单选择排序算法
+	int i,j,k;
+    RedType t;
+    for(i=1; i<(*L).length; i++){  // i 代表趟号
+        j=i;	//选取r[i]~r[n]中的最小记录r[j]	
+        for(k=i+1; k<=(*L).length; k++)
+            if((*L).r[k].key < (*L).r[j].key) j=k;
+        t=(*L).r[i];
+		(*L).r[i]=(*L).r[j];
+		(*L).r[j]=t;  // r[ j]与r[i]交换
+    }
+}
+
+void bubble(SqList *L)//冒泡算法
+{
+	 int i,j;
+	 RedType t;
+     for(i=0; i<(*L).length-1; i++)//i表示趟号
+	     for(j=0;j<(*L).length-i+1;j++)//j表示次数
+		 if((*L).r[i].key>(*L).r[i+1].key){
+		   t=(*L).r[i];
+		   (*L).r[i]=(*L).r[j];
+	       (*L).r[j]=t; 
+		   }
+ }
+
+/* ********************************主函数******************************* */
+void main()
+{
+	SqList L;
+	L.length=5;
+	int i;
+	char ch;
+	for(i=1;i<6;i++)
+	{
+		printf("请输入第%d个同学的成绩和姓名",i);
+		scanf("%d",&L.r[i].key);
+		gets(L.r[i].name);
+	}
+
+	while(1){
+		printf("\n=======Choose List=======");
+		printf("\n 1--直接插入排序");
+		printf("\n 2--简单选择排序");
+		printf("\n 3--冒泡排序");
+		printf("\n 4--快速排序算法*");
+		printf("\n 5--堆排序算法*");
+		printf("\n 6--二路归并排序*");
+        printf("\n 7--结束程序");
+		printf("\n\nPlease Choose:");
+		ch=getchar();
+		switch(ch){
+		case '1':
+			printf("\n**直接插入排序**\n");
+			fflush(stdin);
+			InsertSort(&L);
+			for(i=1;i<6;i++)
+			{
+				printf("%d ",L.r[i].key);
+				puts(L.r[i].name);
+			}
+			break;
+		case '2':
+			printf("\n**简单选择排序**\n");
+            fflush(stdin);
+			SelectSort(&L);
+			for(i=1;i<6;i++)
+			{
+				printf("%d ",L.r[i].key);
+				puts(L.r[i].name);
+			}
+			break;
+		case '3':
+			printf("\n**冒泡排序**\n");
+            fflush(stdin);
+			bubble(&L);
+			for(i=1;i<6;i++)
+			{
+				printf("%d ",L.r[i].key);
+				puts(L.r[i].name);
+			}
+			break;
+		/*case '4':
+			printf("\n**快速排序算法**");
+            PrintAll(L);
+			break;
+		case '5':
+			printf("\n**堆排序算法**");
+            PrintAll(L);
+			break;
+		case '6':
+			printf("\n**二路归并排序**");
+            PrintAll(L);
+			break;
+		case '7':
+			DestroyList_L(L);
+			exit(0);
+		default:
+			printf("\nInvalid Choice");*/
+		}
+	}
+}
