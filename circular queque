@@ -1,0 +1,111 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include"ds.h"
+
+#define TRUE          1
+#define FALSE         0
+#define OK            1
+#define ERROR         0
+#define INFEASIBLE   -1
+#define OVERFLOW     -2
+#define MAXQSIZE      100
+typedef int Status;
+typedef int QElemType;
+
+typedef struct{
+	QElemType  *base;
+	int front;
+	int rear;
+}SqQueue;
+
+Status InitQueue(SqQueue *pQ);
+Status EnQueue(SqQueue *pQ,QElemType e);
+Status DeQueue(SqQueue *pQ,QElemType *pe);
+Status GetHead(SqQueue Q,QElemType *pe);
+Status DestroyQueue(SqQueue *pQ);
+
+
+void main(void){
+	int rc;
+	char ch;
+	QElemType e;
+	
+	SqQueue Q;
+	InitQueue(&Q);
+	while(1){
+		e=0;
+		printf("\n=======SqQueue=======");
+		printf("\n 1--EnQueue");
+		printf("\n 2--DeQueue");
+		printf("\n 3--GetHead");
+		printf("\n 4--Exit.");
+		printf("\n\nPlease Choose:");
+		ch=getchar();
+		switch(ch){
+		case '1':
+			printf("\n**EnQueue**");
+			printf("Input e:");
+			scanf("%d",&e);
+			fflush(stdin);
+			rc=EnQueue(&Q,e);
+			if(rc!=OK)printf("\n invalid");
+			else printf("\ne=%d Inserted",e);
+			break;
+		case '2':
+			printf("\n**DeQueue**");
+			rc=DeQueue(&Q,&e);
+			if(rc!=OK)printf("\ninvalid");
+			else printf("\ne=%d Deleted",e);
+			break;
+		case '3':
+			printf("\n**GetHead**");
+			rc=GetHead(Q,&e);
+			if(rc!=OK)printf("\ni invalid");
+			else printf("\ne=%d Geted",e);
+			break;
+		case '4':
+			DestroyQueue(&Q);
+			exit(0);
+		default:
+			printf("\nInvalid Choice");
+		}
+	}
+}
+
+Status InitQueue(SqQueue *pQ)
+{
+	(*pQ).base=(QElemType *)malloc(MAXQSIZE *sizeof(QElemType));
+	if(!(*pQ).base)exit(OVERFLOW);
+	(*pQ).front=(*pQ).rear=0;
+	return OK;
+}
+
+Status EnQueue(SqQueue *pQ,QElemType e)
+{
+	if(((*pQ).rear+1)%MAXQSIZE==(*pQ).front)return ERROR;
+	(*pQ).base[(*pQ).rear]=e;
+	(*pQ).rear=((*pQ).rear+1)%MAXQSIZE;
+	return OK;
+}
+
+Status DeQueue(SqQueue *pQ,QElemType *pe)
+{
+	if((*pQ).front==(*pQ).rear) return ERROR;
+	*pe=(*pQ).base[(*pQ).front];
+	(*pQ).front=((*pQ).front+1)%MAXQSIZE;
+	return OK;
+}
+
+Status GetHead(SqQueue Q,QElemType *pe)
+{
+	if(Q.front==Q.rear) return ERROR;
+	*pe=Q.base[Q.front];
+	return OK;
+}
+
+Status DestroyQueue(SqQueue *pQ)
+{
+	free((*pQ).base);
+	return OK;
+}
+
